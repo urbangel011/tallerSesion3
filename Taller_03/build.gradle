@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+}
+
+group 'movile_c1'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+
+    implementation 'io.appium:java-client:7.6.0'
+    implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
+
+
+    // cucumber
+    implementation 'io.cucumber:cucumber-java:7.1.0'
+    testImplementation 'io.cucumber:cucumber-junit:7.1.0'
+
+    // reporte
+    implementation 'net.masterthought:cucumber-reporting:5.6.1'
+
+
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+configurations {
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
+}
+
+// gradle cucumber -Psuite=@TAG
+task cucumber() {
+    dependsOn assemble, testClasses
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--glue', 'runner', 'src/test/resources','--tags']+[suite]
+        }
+    }
+}
